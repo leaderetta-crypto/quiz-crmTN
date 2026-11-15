@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz CRM | 9 questions</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#172033;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0;padding:24px 14px;display:flex;justify-content:center}
+main{width:min(720px,100%);background:white;border-radius:20px;padding:clamp(20px,5vw,36px);box-shadow:0 12px 40px #1c31501a}
+.kicker{color:#5267a5;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.78rem}
+h1{margin:.35rem 0 .5rem;font-size:clamp(1.7rem,5vw,2.3rem)}.intro{color:#5c667a;line-height:1.55}
+.progress{height:8px;background:#e8edf6;border-radius:99px;overflow:hidden;margin:22px 0}.bar{height:100%;width:0;background:#5267d8;transition:width .2s}
+.meta{display:flex;justify-content:space-between;color:#68738a;font-size:.9rem}
+.question{font-size:1.2rem;font-weight:750;line-height:1.4;margin:22px 0 16px}
+.answers{display:grid;gap:10px}.answer{width:100%;text-align:left;padding:14px 16px;border:1.5px solid #dce2ed;border-radius:12px;background:white;color:#172033;font-size:1rem;cursor:pointer}
+.answer:hover{border-color:#5267d8;background:#f7f8ff}.answer.selected{border-color:#5267d8;background:#eef0ff}
+.answer:disabled{cursor:default}.answer.correct{border-color:#198754;background:#eaf7ef}.answer.wrong{border-color:#c43d4b;background:#fff0f1}
+.feedback{margin-top:14px;padding:13px 15px;border-radius:12px;background:#f3f6fb;line-height:1.5;display:none}.feedback.show{display:block}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+button.primary{background:#293caa;color:white;border:0;border-radius:11px;padding:12px 19px;font-weight:700;font-size:1rem;cursor:pointer}
+button.primary:disabled{opacity:.4;cursor:not-allowed}.result{text-align:center;padding:20px 0}.score{font-size:3.3rem;font-weight:800;color:#293caa;margin:10px}
+.review{text-align:left;margin-top:25px}.review li{margin:12px 0;line-height:1.5}
+.small{font-size:.9rem;color:#68738a}.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">Mini-évaluation · Gestion de la relation client</div>
+  <h1>Quiz : les 3 types de CRM</h1>
+  <p class="intro">Teste tes connaissances sur le CRM opérationnel, analytique et collaboratif. 9 questions, une seule bonne réponse par question. Ton score et les explications apparaîtront à la fin.</p>
+  <div id="quiz">
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="meta"><span id="counter">Question 1 sur 9</span><span id="answered">0 réponse</span></div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <div class="actions"><button class="primary" id="next" disabled>Question suivante</button></div>
+  </div>
+  <section id="result" class="result hidden"></section>
+  <p class="small">Conseil : lis bien chaque situation avant de choisir le type de CRM correspondant.</p>
+</main>
+<script>
+const questions = [
+ {q:"Une entreprise automatise l’envoi d’un e-mail de confirmation après chaque achat. Quel type de CRM utilise-t-elle ?",a:["CRM analytique","CRM opérationnel","CRM collaboratif"],c:1,e:"Le CRM opérationnel automatise les activités quotidiennes : ventes, marketing et service client."},
+ {q:"Une société étudie l’historique d’achat pour identifier ses clients les plus fidèles. Il s’agit du :",a:["CRM analytique","CRM collaboratif","CRM opérationnel"],c:0,e:"Le CRM analytique exploite les données pour comprendre les comportements et segmenter les clients."},
+ {q:"Le service commercial partage les informations d’un client avec le service après-vente. C’est le :",a:["CRM opérationnel","CRM analytique","CRM collaboratif"],c:2,e:"Le CRM collaboratif facilite le partage d’informations et la coordination entre les équipes."},
+ {q:"Quel est l’objectif principal du CRM opérationnel ?",a:["Analyser les tendances du marché","Automatiser les interactions et processus clients","Partager les données entre départements uniquement"],c:1,e:"Il aide à gérer et automatiser les interactions avec les clients au quotidien."},
+ {q:"Une entreprise regroupe ses clients selon leur fréquence d’achat et leur panier moyen. Quel CRM est le plus adapté ?",a:["CRM collaboratif","CRM analytique","CRM opérationnel"],c:1,e:"La segmentation à partir des données clients relève du CRM analytique."},
+ {q:"Un client contacte le support. L’agent consulte l’historique des échanges enregistré et partagé avec les autres services. Quel type est particulièrement mobilisé pour le partage ?",a:["CRM collaboratif","CRM analytique","CRM opérationnel"],c:0,e:"Le CRM collaboratif permet aux différents services d’accéder aux informations utiles sur le client."},
+ {q:"Laquelle de ces activités correspond le mieux au CRM opérationnel ?",a:["Prévoir le risque de départ des clients grâce aux données","Lancer une campagne e-mail automatisée","Partager le dossier client entre les équipes"],c:1,e:"L’automatisation d’une campagne marketing est une fonction typique du CRM opérationnel."},
+ {q:"Une direction utilise des tableaux de bord pour prévoir les ventes à partir des comportements passés. Elle utilise surtout le :",a:["CRM collaboratif","CRM opérationnel","CRM analytique"],c:2,e:"L’analyse des données et la prévision des ventes sont des usages du CRM analytique."},
+ {q:"Quelle association est correcte ?",a:["Opérationnel = analyser ; analytique = partager ; collaboratif = automatiser","Opérationnel = automatiser ; analytique = analyser ; collaboratif = partager","Opérationnel = partager ; analytique = automatiser ; collaboratif = analyser"],c:1,e:"À retenir : opérationnel = agir/automatiser ; analytique = comprendre/analyser ; collaboratif = partager/coordonner."}
+];
+let index=0, answers=Array(questions.length).fill(null);
+const $=id=>document.getElementById(id);
+function render(){
+ const item=questions[index];
+ $("counter").textContent=`Question ${index+1} sur ${questions.length}`;
+ $("answered").textContent=`${answers.filter(x=>x!==null).length} réponse(s)`;
+ $("bar").style.width=`${index/questions.length*100}%`;
+ $("question").textContent=item.q;
+ $("answers").innerHTML="";
+ item.a.forEach((label,i)=>{
+  const b=document.createElement("button"); b.className="answer"; b.textContent=String.fromCharCode(65+i)+". "+label;
+  if(answers[index]===i)b.classList.add("selected");
+  b.onclick=()=>{answers[index]=i;renderAnswers();};
+  $("answers").appendChild(b);
+ });
+ $("feedback").className="feedback"; $("feedback").textContent="";
+ $("next").disabled=answers[index]===null;
+ $("next").textContent=index===questions.length-1?"Voir mon résultat":"Question suivante";
+}
+function renderAnswers(){
+ [...$("answers").children].forEach((b,i)=>{b.classList.toggle("selected",answers[index]===i)});
+ $("next").disabled=answers[index]===null;
+ $("answered").textContent=`${answers.filter(x=>x!==null).length} réponse(s)`;
+}
+$("next").onclick=()=>{
+ if(answers[index]===null)return;
+ if(index<questions.length-1){index++;render();}else showResult();
+};
+function showResult(){
+ const score=answers.reduce((s,a,i)=>s+(a===questions[i].c?1:0),0);
+ $("quiz").classList.add("hidden");
+ const r=$("result");r.classList.remove("hidden");
+ let message=score>=8?"Excellent ! Tu maîtrises très bien les trois types de CRM.":score>=6?"Bon travail ! Quelques notions méritent encore une révision.":"Continue à t’entraîner : relis les explications pour bien distinguer les trois types.";
+ r.innerHTML=`<div class="kicker">Résultat final</div><h2>Ton score</h2><div class="score">${score} / 9</div><p>${message}</p><div class="review"><h3>Correction détaillée</h3><ol>${questions.map((q,i)=>`<li><strong>${q.q}</strong><br>Ta réponse : ${answers[i]===null?"Aucune réponse":q.a[answers[i]]}<br><strong>Bonne réponse : ${q.a[q.c]}</strong><br><span class="small">${q.e}</span></li>`).join("")}</ol></div><button class="primary" id="again">Recommencer le quiz</button>`;
+ $("again").onclick=()=>{index=0;answers=Array(questions.length).fill(null);r.classList.add("hidden");$("quiz").classList.remove("hidden");render();};
+ $("bar").style.width="100%";
+}
+render();
+</script>
+</body>
+</html>
